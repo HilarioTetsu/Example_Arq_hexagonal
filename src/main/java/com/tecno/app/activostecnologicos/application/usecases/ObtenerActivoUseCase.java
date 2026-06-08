@@ -4,13 +4,9 @@ import com.tecno.app.activostecnologicos.application.ports.in.IObtenerActivoPort
 import com.tecno.app.activostecnologicos.application.ports.in.dto.mapper.ActivoMapper;
 import com.tecno.app.activostecnologicos.application.ports.in.dto.query.ObtenerActivoFiltrosQuery;
 import com.tecno.app.activostecnologicos.application.ports.in.dto.response.ActivoResponse;
+import com.tecno.app.activostecnologicos.application.ports.in.dto.response.PaginaResponse;
 import com.tecno.app.activostecnologicos.application.ports.out.IActivoTecnologicoRepository;
-import com.tecno.app.activostecnologicos.application.ports.out.ICategoriaRepository;
-import com.tecno.app.activostecnologicos.application.utils.Utils;
 import com.tecno.app.activostecnologicos.domain.models.ActivoTecnologico;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -26,15 +22,24 @@ public class ObtenerActivoUseCase implements IObtenerActivoPort {
     }
 
     @Override
-    public Page<ActivoResponse> ejecutar(ObtenerActivoFiltrosQuery query) {
+    public PaginaResponse<ActivoResponse> ejecutar(ObtenerActivoFiltrosQuery query) {
 
-        Pageable pageable = PageRequest.of(query.page(), query.size(), Utils.parseSortParams(query.sorts()));
+        PaginaResponse<ActivoTecnologico> paginaDominio = activoRepo.buscarActivoTecnologico(
+                query.page(), query.size(), query.sorts(), query.numSerie(), query.marca(),
+                query.modelo(), query.costoMin(), query.costoMax(), query.estado(), query.categoriaId()
+        );
 
-        Page<ActivoTecnologico> page = activoRepo.buscarActivoTecnologico(pageable, query.numSerie(), query.marca(), query.modelo(), query.costoMin(),query.costoMax(),query.estado(),query.categoriaId());
+        List<ActivoResponse> contenidoMapeado = paginaDominio.contenido().stream()
+                .map(ActivoMapper::toResponse)
+                .toList();
 
-        return page.map(p -> ActivoMapper.toResponse(p));
-
-
+        return new PaginaResponse<>(
+                contenidoMapeado,
+                paginaDominio.numeroPagina(),
+                paginaDominio.tamano(),
+                paginaDominio.totalElementos(),
+                paginaDominio.totalPaginas()
+        );
     }
 
     @Override

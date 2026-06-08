@@ -1,4 +1,4 @@
-package com.tecno.app.activostecnologicos.application.utils;
+package com.tecno.app.activostecnologicos.infrastructure.output.persistence.utils;
 
 import org.springframework.data.domain.Sort;
 

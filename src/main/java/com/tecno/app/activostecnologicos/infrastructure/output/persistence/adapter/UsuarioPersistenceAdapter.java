@@ -4,7 +4,6 @@ import com.tecno.app.activostecnologicos.application.ports.out.IUsuarioRepositor
 import com.tecno.app.activostecnologicos.domain.models.Usuario;
 import com.tecno.app.activostecnologicos.infrastructure.output.persistence.entity.UsuarioEntity;
 import com.tecno.app.activostecnologicos.infrastructure.output.persistence.repository.IJpaUsuarioRepository;
-import io.jsonwebtoken.security.Password;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
@@ -28,7 +27,7 @@ public class UsuarioPersistenceAdapter implements IUsuarioRepository {
     UsuarioEntity entity = UsuarioEntity.builder()
             .id(usuario.getId())
             .role(usuario.getRole())
-            .password(encoder.encode(usuario.getPassword()))
+            .password(usuario.getPassword())
             .username(usuario.getUsername())
             .build();
 

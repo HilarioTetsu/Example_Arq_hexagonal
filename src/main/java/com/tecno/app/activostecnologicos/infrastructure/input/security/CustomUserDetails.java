@@ -2,7 +2,6 @@ package com.tecno.app.activostecnologicos.infrastructure.input.security;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 

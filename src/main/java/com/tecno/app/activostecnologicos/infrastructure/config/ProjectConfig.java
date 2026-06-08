@@ -3,6 +3,7 @@ package com.tecno.app.activostecnologicos.infrastructure.config;
 import com.tecno.app.activostecnologicos.application.ports.in.*;
 import com.tecno.app.activostecnologicos.application.ports.out.IActivoTecnologicoRepository;
 import com.tecno.app.activostecnologicos.application.ports.out.ICategoriaRepository;
+import com.tecno.app.activostecnologicos.application.ports.out.IPasswordHasher;
 import com.tecno.app.activostecnologicos.application.ports.out.IUsuarioRepository;
 import com.tecno.app.activostecnologicos.application.usecases.*;
 import org.springframework.context.annotation.Bean;
@@ -35,9 +36,8 @@ public class ProjectConfig {
     }
 
     @Bean
-    public ICrearUsuarioPort crearUsuarioPort(IUsuarioRepository usuarioRepository){
-
-        return new CrearUsuarioUseCase(usuarioRepository);
+    public ICrearUsuarioPort crearUsuarioPort(IUsuarioRepository usuarioRepository, IPasswordHasher passwordHasher){
+        return new CrearUsuarioUseCase(usuarioRepository, passwordHasher);
     }
 
     @Bean
