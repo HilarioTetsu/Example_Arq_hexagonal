@@ -1,0 +1,33 @@
+
+services:
+  localstack:
+    container_name: localstack_infra
+    image: localstack/localstack:latest
+    ports:
+      - "4566:4566"
+      - "4510:4510"
+    environment:
+      - SERVICES=rds
+      - AWS_DEFAULT_REGION=us-east-1
+      - LOCALSTACK_AUTH_TOKEN=${LS_TOKEN}
+    volumes:
+      - "./volume:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - red-cloud-local
+
+  app-monolito:
+    container_name: activos_backend
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=local
+    depends_on:
+      - localstack
+    networks:
+      - red-cloud-local
+
+networks:
+  red-cloud-local:
+    driver: bridge
