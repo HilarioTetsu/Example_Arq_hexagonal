@@ -4,7 +4,6 @@ import com.tecno.app.activostecnologicos.application.ports.out.IUsuarioRepositor
 import com.tecno.app.activostecnologicos.domain.models.Usuario;
 import com.tecno.app.activostecnologicos.infrastructure.output.persistence.entity.UsuarioEntity;
 import com.tecno.app.activostecnologicos.infrastructure.output.persistence.repository.IJpaUsuarioRepository;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 import java.util.NoSuchElementException;
@@ -14,11 +13,10 @@ public class UsuarioPersistenceAdapter implements IUsuarioRepository {
 
     private final IJpaUsuarioRepository repository;
 
-    private final PasswordEncoder encoder;
 
-    public UsuarioPersistenceAdapter(IJpaUsuarioRepository repository, PasswordEncoder encoder) {
+
+    public UsuarioPersistenceAdapter(IJpaUsuarioRepository repository) {
         this.repository = repository;
-        this.encoder = encoder;
     }
 
     @Override
