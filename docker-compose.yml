@@ -1,14 +1,27 @@
+version: '3.8'
 
 services:
+  # 1. Tu Base de Datos (Reemplaza la simulación RDS)
+  postgres_db:
+    container_name: activos_db_local
+    image: postgres:17
+    environment:
+      - POSTGRES_USER=db_admin_local
+      - POSTGRES_PASSWORD=super_secret_pass_local
+      - POSTGRES_DB=activos_db
+    ports:
+      - "4510:5432" # Lo mapeamos al 4510 externo para que DBeaver siga funcionando igual
+    networks:
+      - red-cloud-local
+
+  # 2. LocalStack (Listo para futuros servicios de AWS que no sean BD)
   localstack:
     container_name: localstack_infra
     image: localstack/localstack:latest
     ports:
       - "4566:4566"
-      - "4510:4510"
     environment:
-      - SERVICES=rds
-      - AWS_DEFAULT_REGION=us-east-1
+      - DOCKER_HOST=unix:///var/run/docker.sock
       - LOCALSTACK_AUTH_TOKEN=${LS_TOKEN}
     volumes:
       - "./volume:/var/lib/localstack"
@@ -16,17 +29,21 @@ services:
     networks:
       - red-cloud-local
 
+  # 3. Tu Monolito Spring Boot
   app-monolito:
     container_name: activos_backend
     build: .
+    restart: on-failure
     ports:
       - "8080:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=local
-    depends_on:
-      - localstack
+      # Redirigimos dinámicamente a Spring Boot hacia el nuevo contenedor postgres_db
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres_db:5432/activos_db
     networks:
       - red-cloud-local
+    depends_on:
+      - postgres_db
 
 networks:
   red-cloud-local:
