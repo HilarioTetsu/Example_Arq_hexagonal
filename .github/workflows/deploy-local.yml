@@ -7,7 +7,6 @@ on:
 
 jobs:
   build-and-deploy:
-    # Indica que debe ejecutarse en tu Runner local
     runs-on: self-hosted
 
     steps:
@@ -24,23 +23,18 @@ jobs:
       - name: 3. Compilar Proyecto Spring Boot (JAR)
         run: ./mvnw clean package -DskipTests
 
-      - name: 4. Autenticar Docker con LocalStack ECR y Build Image
-        run: |
-          # Crear el tag de la imagen usando el hash del commit o latest
-          docker build -t activos-tecnologicos-repo:latest .
-
-      - name: 5. Instalar / Configurar Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.6.0
-
-      - name: 6. Aplicar Infraestructura con Terraform
+      - name: 4. Crear Infraestructura con Terraform
         run: |
           cd terraform
           terraform init
           terraform apply -auto-approve
 
-      - name: 7. Tag & Push de la Imagen a LocalStack ECR
+      - name: 5. Autenticar Docker con LocalStack ECR
         run: |
+          aws --endpoint-url=http://localhost:4566 ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin localhost:4566
+
+      - name: 6. Build, Tag & Push de la Imagen a LocalStack
+        run: |
+          docker build -t activos-tecnologicos-repo:latest .
           docker tag activos-tecnologicos-repo:latest localhost:4566/activos-tecnologicos-repo:latest
           docker push localhost:4566/activos-tecnologicos-repo:latest
