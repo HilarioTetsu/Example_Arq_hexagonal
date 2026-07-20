@@ -1,0 +1,46 @@
+name: CI/CD Pipeline Local (Terraform + LocalStack)
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    # Indica que debe ejecutarse en tu Runner local
+    runs-on: self-hosted
+
+    steps:
+      - name: 1. Checkout del Código
+        uses: actions/checkout@v4
+
+      - name: 2. Configurar Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: 3. Compilar Proyecto Spring Boot (JAR)
+        run: ./mvnw clean package -DskipTests
+
+      - name: 4. Autenticar Docker con LocalStack ECR y Build Image
+        run: |
+          # Crear el tag de la imagen usando el hash del commit o latest
+          docker build -t activos-tecnologicos-repo:latest .
+
+      - name: 5. Instalar / Configurar Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.0
+
+      - name: 6. Aplicar Infraestructura con Terraform
+        run: |
+          cd terraform
+          terraform init
+          terraform apply -auto-approve
+
+      - name: 7. Tag & Push de la Imagen a LocalStack ECR
+        run: |
+          docker tag activos-tecnologicos-repo:latest localhost:4566/activos-tecnologicos-repo:latest
+          docker push localhost:4566/activos-tecnologicos-repo:latest
