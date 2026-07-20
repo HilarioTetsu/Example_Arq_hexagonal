@@ -23,14 +23,21 @@ jobs:
       - name: 3. Compilar Proyecto Spring Boot (JAR)
         run: ./mvnw clean package -DskipTests
 
-      - name: 4. Crear Infraestructura con Terraform
+      - name: 4. Inicializar Terraform y Crear SOLO el Repositorio ECR
         run: |
           cd terraform
           terraform init
-          terraform apply -auto-approve
+          # El flag -target le dice que solo cree este recurso por ahora
+          terraform apply -target="aws_ecr_repository.app_repo" -auto-approve
 
-      - name: 5. Build, Tag & Push de la Imagen a LocalStack
+      - name: 5. Build, Tag & Push de la Imagen (Usando 127.0.0.1)
         run: |
           docker build -t activos-tecnologicos-repo:latest .
-          docker tag activos-tecnologicos-repo:latest localhost:4566/activos-tecnologicos-repo:latest
-          docker push localhost:4566/activos-tecnologicos-repo:latest
+          docker tag activos-tecnologicos-repo:latest 127.0.0.1:4566/activos-tecnologicos-repo:latest
+          docker push 127.0.0.1:4566/activos-tecnologicos-repo:latest
+
+      - name: 6. Desplegar el resto de la Infraestructura (VPC, RDS, ECS)
+        run: |
+          cd terraform
+          # Esto aplicará todo lo demás que falta en tu main.tf
+          terraform apply -auto-approve
