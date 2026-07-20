@@ -16,6 +16,9 @@ provider "aws" {
   skip_metadata_api_check     = true
   skip_requesting_account_id  = true
 
+  # (Nuevo) Necesario para evitar llamadas a STS real
+  s3_use_path_style           = true
+
   # Redirección de servicios de AWS hacia tu LocalStack
   endpoints {
     ecr            = "http://localhost:4566"
@@ -23,5 +26,7 @@ provider "aws" {
     rds            = "http://localhost:4566"
     iam            = "http://localhost:4566"
     logs           = "http://localhost:4566"
+    # --- LA SOLUCIÓN AL ERROR ---
+    ec2            = "http://localhost:4566"
   }
 }
