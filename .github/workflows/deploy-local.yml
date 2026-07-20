@@ -30,6 +30,10 @@ jobs:
           terraform apply -auto-approve
 
       - name: 5. Autenticar Docker con LocalStack ECR
+        env:
+          AWS_ACCESS_KEY_ID: test
+          AWS_SECRET_ACCESS_KEY: test
+          AWS_DEFAULT_REGION: us-east-1
         run: |
           aws --endpoint-url=http://localhost:4566 ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin localhost:4566
 
