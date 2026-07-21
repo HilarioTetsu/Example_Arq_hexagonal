@@ -46,8 +46,8 @@ resource "aws_db_instance" "postgres" {
   engine               = "postgres"
   engine_version       = "15.3"
   instance_class       = "db.t3.micro"
-  username             = "postgres"
-  password             = "postgres"
+  username             = "db_admin_local"
+  password             = "super_secret_pass_local"
   skip_final_snapshot  = true
 }
 
@@ -72,7 +72,9 @@ resource "aws_ecs_task_definition" "app_task" {
       ]
       environment = [
         { name = "SPRING_PROFILES_ACTIVE", value = "local" },
-        { name = "SPRING_DATASOURCE_URL", value = "jdbc:postgresql://${aws_db_instance.postgres.endpoint}/activostecnologicos" }
+        { name = "SPRING_DATASOURCE_URL", value = "jdbc:postgresql://${aws_db_instance.postgres.endpoint}/activostecnologicos" },
+        { name = "SPRING_DATASOURCE_USERNAME", value = aws_db_instance.postgres.username },
+        { name = "SPRING_DATASOURCE_PASSWORD", value = aws_db_instance.postgres.password }
       ]
     }
   ])
