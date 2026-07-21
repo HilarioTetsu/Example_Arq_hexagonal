@@ -33,8 +33,8 @@ jobs:
       - name: 5. Build, Tag & Push de la Imagen (Usando 127.0.0.1)
         run: |
           docker build -t activos-tecnologicos-repo:latest .
-          docker tag activos-tecnologicos-repo:latest localhost.localstack.cloud:4566/activos-tecnologicos-repo:latest
-          docker push localhost.localstack.cloud:4566/activos-tecnologicos-repo:latest
+          docker tag activos-tecnologicos-repo:latest localhost.localstack.cloud:4510/activos-tecnologicos-repo:latest
+          docker push localhost.localstack.cloud:4510/activos-tecnologicos-repo:latest
 
       - name: 6. Desplegar el resto de la Infraestructura (VPC, RDS, ECS)
         run: |
